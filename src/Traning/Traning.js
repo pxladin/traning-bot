@@ -88,10 +88,13 @@ class Traning {
     const json = {
       author: this.author.toUpperCase(),
       content: this.content,
-      solver: _.omit(this.solver.toJSON(), 'guesses'),
     };
 
-    return _.omitBy(json, Boolean);
+    if (this.solver) {
+      json.solver = _.omit(this.solver, 'guesses');
+    }
+
+    return json;
   }
 }
 
