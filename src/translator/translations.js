@@ -6,4 +6,7 @@ module.exports = {
       'Sowas kann nur von :person kommen.',
     ],
   },
+  formatting: {
+    traning: ':author: :content',
+  },
 };

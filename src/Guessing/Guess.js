@@ -20,6 +20,8 @@ class Guess {
     this.author = '';
 
     Object.assign(this, Guess.pattern.exec(this.raw).groups);
+
+    this.author = this.author.toUpperCase();
   }
 
   /**

@@ -1,7 +1,8 @@
+const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
-/*  eslint-disable no-unused-vars */
 const Context = require('./Context');
+/*  eslint-disable no-unused-vars */
 const Guesser = require('../Guessing/Guesser');
 /*  eslint-enable no-unused-vars */
 
@@ -57,6 +58,14 @@ class Collection {
   }
 
   /**
+   * Reads the JSON data of the storage file.
+   * @returns {string} The content of the storage file.
+   */
+  read() {
+    return fs.readFileSync(this.path, { encoding: 'utf8' });
+  }
+
+  /**
    * Syncs the collection with the storage file.
    * @returns The current collection instance.
    */
@@ -66,13 +75,19 @@ class Collection {
   }
 
   /**
-   * Loads the JSON object form the storage file.
+   * Loads the JSON object from the storage file.
    * @returns The current collection instance.
    */
   load() {
-    this.json = JSON.parse(fs.readFileSync(this.path, { encoding: 'utf-8' }));
+    this.json = JSON.parse(this.read());
 
     return this;
+  }
+
+  random() {
+    const key = _.sample(Object.keys(_.omit(this.json, 'guessers')));
+
+    return Context.format(this.json[key]);
   }
 
   toJSON() {

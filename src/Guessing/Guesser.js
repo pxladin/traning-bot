@@ -66,7 +66,7 @@ class Guesser {
 
       msg.channel.send(
         translate('guessing.correct_answer', {
-          person: traning.author.toUpperCase(),
+          person: traning.author,
         }),
       );
     }

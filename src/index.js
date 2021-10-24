@@ -1,4 +1,4 @@
-const { token } = require('../config.json');
+const { token, prefix } = require('../config.json');
 const client = require('./client');
 const Collection = require('./Traning/Collection');
 const Context = require('./Traning/Context');
@@ -14,7 +14,15 @@ client.on('messageCreate', async (msg) => {
     return;
   }
 
-  const { content, channelId } = msg;
+  const { content, channelId, channel } = msg;
+
+  if (content.startsWith(prefix)) {
+    const [command] = content.slice(prefix.length).split(/ +/g);
+
+    if (command === 'rand') {
+      channel.send(collection.random());
+    }
+  }
 
   if (Guess.isGuess(content) || Traning.isTraning(content)) {
     if (collection.has(channelId)) {

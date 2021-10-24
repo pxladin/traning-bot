@@ -38,6 +38,8 @@ class Traning {
     this.solver = null;
 
     Object.assign(this, Traning.pattern.exec(this.raw).groups);
+
+    this.author = this.author.toUpperCase();
   }
 
   /**
@@ -69,7 +71,7 @@ class Traning {
    * @returns {string} The formatted traning.
    */
   format() {
-    return `${this.author.toUpperCase()}: "${this.content}"`;
+    return `${this.author}: "${this.content}"`;
   }
 
   /**
@@ -86,7 +88,7 @@ class Traning {
    */
   toJSON() {
     const json = {
-      author: this.author.toUpperCase(),
+      author: this.author,
       content: this.content,
     };
 

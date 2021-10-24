@@ -4,6 +4,7 @@ const { Message } = require('discord.js');
 
 const Traning = require('./Traning');
 const util = require('../util');
+const translate = require('../translator/translate');
 
 /**
  * Represents a full traning with complete context.
@@ -22,10 +23,6 @@ class Context {
      */
     this.raw = msg.content;
     /**
-     * The parent channel of the message.
-     */
-    this.parent = msg.channel;
-    /**
      * The user who sent the message.
      */
     this.user = msg.author;
@@ -43,6 +40,17 @@ class Context {
      * UNIX timestamp of when the traning was created.
      */
     this.createdAt = Date.now();
+  }
+
+  static format(json) {
+    const traning = json.traninge.map((t) =>
+      translate('formatting.traning', {
+        author: t.author,
+        content: t.content,
+      }),
+    );
+
+    return traning.join('\n');
   }
 
   /**
@@ -104,7 +112,7 @@ class Context {
 
         return traning
           .format()
-          .replaceAll(traning.author.toUpperCase(), traning.id);
+          .replaceAll(traning.author, traning.id);
       })
       .join('\n');
   }
