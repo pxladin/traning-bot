@@ -6,7 +6,8 @@ const Guess = require('./Guessing/Guess');
 const Guesser = require('./Guessing/Guesser');
 const Traning = require('./Traning/Traning');
 
-const collection = new Collection('data/traninge.json').sync();
+const collection = new Collection('data/traninge.json');
+collection.load();
 
 client.on('messageCreate', async (msg) => {
   if (msg.author.id === client.user.id) {
@@ -15,33 +16,36 @@ client.on('messageCreate', async (msg) => {
 
   const { content, channelId } = msg;
 
-  if (collection.has(channelId) && Guess.isGuess(content)) {
-    if (!collection.guessers.has(msg.author.id)) {
-      collection.guessers.set(msg.author.id, new Guesser(msg.author));
+  if (Guess.isGuess(content) || Traning.isTraning(content)) {
+    if (collection.has(channelId)) {
+      if (!collection.guessers.has(msg.author.id)) {
+        collection.guessers.set(msg.author.id, new Guesser(msg.author));
+      }
+
+      const guesser = collection.guessers.get(msg.author.id);
+      const context = collection.get(channelId);
+      const isSolved = guesser.guess(msg, context);
+
+      if (isSolved) {
+        collection.set(channelId, context);
+        context.sync();
+      }
     }
 
-    const guesser = collection.guessers.get(msg.author.id);
-    const context = collection.get(channelId);
-    const isSolved = guesser.guess(msg, context);
+    if (Traning.isTraning(content)) {
+      if (msg.deletable) {
+        msg.delete();
+      }
 
-    if (isSolved) {
-      collection.set(channelId, context);
-      context.sync();
+      const context = new Context(msg);
+
+      context.parse();
+      await context.startGuessThread();
+      collection.set(context.thread.id, context);
     }
+
+    collection.sync();
   }
-
-  if (Traning.isTraning(content)) {
-    if (msg.deletable) {
-      msg.delete();
-    }
-
-    const context = new Context(msg).parse();
-
-    await context.startGuessThread();
-    collection.set(context.thread.id, context);
-  }
-
-  collection.sync();
 });
 
 client.login(token);

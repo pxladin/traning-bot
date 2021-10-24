@@ -27,7 +27,7 @@ class Guesser {
      * A map of traninge the guesser has guessed on.
      * @type {Map<any, string[]>}
      */
-    this.traninge = new Map();
+    this.guesses = new Map();
   }
 
   /**
@@ -43,9 +43,9 @@ class Guesser {
     const traning = context.fetch(guess.id || null);
     const { id: contextId } = context.thread;
 
-    if (!this.traninge.has(contextId)) {
-      this.traninge.set(contextId, []);
-    } else if (this.traninge.get(contextId).length === Guess.MAX) {
+    if (!this.guesses.has(contextId)) {
+      this.guesses.set(contextId, []);
+    } else if (this.guesses.get(contextId).length === Guess.MAX) {
       msg.channel.send(
         translate('guessing.not_enough_guesses', {
           max: Guess.MAX,
@@ -55,14 +55,20 @@ class Guesser {
       return false;
     }
 
-    this.traninge.get(contextId).push(guess.raw);
+    this.guesses.get(contextId).push(guess.raw);
 
     if (traning.author === guess.author) {
-      traning.solve(this);
+      context.traninge.forEach((t) => {
+        if (t.author === guess.author) {
+          t.solve(this);
+        }
+      });
 
-      msg.channel.send(translate('guessing.correct_answer', {
-        person: traning.author.toUpperCase(),
-      }));
+      msg.channel.send(
+        translate('guessing.correct_answer', {
+          person: traning.author.toUpperCase(),
+        }),
+      );
     }
 
     return traning.solved;
@@ -72,7 +78,7 @@ class Guesser {
     return {
       id: this.id,
       tag: this.tag,
-      traninge: util.mapToObject(this.traninge),
+      guesses: util.mapToObject(this.guesses),
     };
   }
 }

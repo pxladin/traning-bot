@@ -58,12 +58,18 @@ class Collection {
 
   /**
    * Syncs the collection with the storage file.
-   *
    * @returns The current collection instance.
    */
   sync() {
     fs.writeFileSync(this.path, JSON.stringify(this.toJSON(), null, 2));
+    this.load();
+  }
 
+  /**
+   * Loads the JSON object form the storage file.
+   * @returns The current collection instance.
+   */
+  load() {
     this.json = JSON.parse(fs.readFileSync(this.path, { encoding: 'utf-8' }));
 
     return this;

@@ -79,6 +79,8 @@ class Context {
         traning.id = String(IDGenerator.next().value);
 
         this.authors.add(author);
+      } else {
+        traning.id = String([...this.authors.values()].indexOf(author) + 1);
       }
 
       this.traninge.push(traning);
@@ -91,12 +93,12 @@ class Context {
    * Turns the context into a readable string
    * and replaces the author's acronyms with their ID.
    *
-   * @param {Traning[]} exclude An array of traninge to exclude.
+   * @param {string[]} exclude An array of traning authors to exclude.
    */
   encrypt(exclude = []) {
     return this.traninge
       .map((traning) => {
-        if (exclude.includes(traning)) {
+        if (exclude.includes(traning.author)) {
           return traning.format();
         }
 
@@ -114,7 +116,9 @@ class Context {
    */
   async sync() {
     const starterMsg = await this.thread.fetchStarterMessage();
-    const solvedTraninge = this.traninge.filter((traning) => traning.solved);
+    const solvedTraninge = this.traninge
+      .filter((traning) => traning.solved)
+      .map((traning) => traning.author);
 
     if (starterMsg.editable) {
       starterMsg.edit(this.encrypt([...solvedTraninge]));
