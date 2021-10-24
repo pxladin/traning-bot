@@ -114,8 +114,8 @@ class Context {
    * If a traning is solved, then the thread starter message will be edited by
    * replacing the author ID with the real name.
    */
-  async sync() {
-    const starterMsg = await this.thread.fetchStarterMessage();
+  sync() {
+    const starterMsg = this.threadStarterMessage;
     const solvedTraninge = this.traninge
       .filter((traning) => traning.solved)
       .map((traning) => traning.author);
@@ -129,9 +129,9 @@ class Context {
    * Starts a thread that allows users to guess the authors of the traning.
    */
   async startGuessThread() {
-    const msg = await this.msg.channel.send(this.encrypt());
+    this.threadStarterMessage = await this.msg.channel.send(this.encrypt());
 
-    this.thread = await msg.startThread({
+    this.thread = await this.threadStarterMessage.startThread({
       name: 'Guess the dropper(s) of the traning.',
       autoArchiveDuration: 60,
     });
