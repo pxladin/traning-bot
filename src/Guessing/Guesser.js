@@ -4,6 +4,7 @@ const Context = require('../Traning/Context');
 /*  eslint-enable no-unused-vars */
 
 const Guess = require('./Guess');
+const translate = require('../translator/translate');
 const util = require('../util');
 
 /**
@@ -42,15 +43,27 @@ class Guesser {
     const traning = context.fetch(guess.id || null);
     const { id: contextId } = context.thread;
 
-    if (traning.author === guess.author) {
-      traning.solve(this);
-    }
-
     if (!this.traninge.has(contextId)) {
       this.traninge.set(contextId, []);
+    } else if (this.traninge.get(contextId).length === Guess.MAX) {
+      msg.channel.send(
+        translate('guessing.not_enough_guesses', {
+          max: Guess.MAX,
+        }),
+      );
+
+      return false;
     }
 
     this.traninge.get(contextId).push(guess.raw);
+
+    if (traning.author === guess.author) {
+      traning.solve(this);
+
+      msg.channel.send(translate('guessing.correct_answer', {
+        person: traning.author.toUpperCase(),
+      }));
+    }
 
     return traning.solved;
   }

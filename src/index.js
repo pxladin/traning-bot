@@ -20,8 +20,8 @@ client.on('messageCreate', async (msg) => {
       collection.guessers.set(msg.author.id, new Guesser(msg.author));
     }
 
-    const context = collection.get(channelId);
     const guesser = collection.guessers.get(msg.author.id);
+    const context = collection.get(channelId);
     const isSolved = guesser.guess(msg, context);
 
     if (isSolved) {
