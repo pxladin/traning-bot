@@ -13,5 +13,6 @@ module.exports = {
     'function-paren-newline': 'off',
     'no-underscore-dangle': 'off',
     'generator-star-spacing': 'off',
+    'import/no-dynamic-require': 'off',
   },
 };

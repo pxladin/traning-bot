@@ -1,5 +1,4 @@
-const { token, prefix } = require('../config.json');
-const client = require('./client');
+const { client, commands } = require('./client');
 const Collection = require('./Traning/Collection');
 const Context = require('./Traning/Context');
 const Guess = require('./Guessing/Guess');
@@ -9,20 +8,24 @@ const Traning = require('./Traning/Traning');
 const collection = new Collection('data/traninge.json');
 collection.load();
 
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isCommand()) return;
+
+  const command = commands.get(interaction.commandName);
+
+  if (!command) {
+    return;
+  }
+
+  command.execute(interaction, collection);
+});
+
 client.on('messageCreate', async (msg) => {
   if (msg.author.id === client.user.id) {
     return;
   }
 
-  const { content, channelId, channel } = msg;
-
-  if (content.startsWith(prefix)) {
-    const [command] = content.slice(prefix.length).split(/ +/g);
-
-    if (command === 'rand') {
-      channel.send(collection.random());
-    }
-  }
+  const { content, channelId } = msg;
 
   if (Guess.isGuess(content) || Traning.isTraning(content)) {
     if (collection.has(channelId)) {
@@ -55,5 +58,3 @@ client.on('messageCreate', async (msg) => {
     collection.sync();
   }
 });
-
-client.login(token);

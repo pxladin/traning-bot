@@ -16,7 +16,7 @@ class Collection {
     /**
      * The path to the storage file.
      */
-    this.path = path.resolve(process.cwd(), '..', file);
+    this.path = path.resolve(process.cwd(), file);
     /**
      * Modifiable traning contexts mapped by their thread ID.
      * @type {Object<string, any>}
@@ -85,6 +85,10 @@ class Collection {
   }
 
   random() {
+    if (!_.size(this.traninge)) {
+      return null;
+    }
+
     const key = _.sample(Object.keys(_.omit(this.json, 'guessers')));
 
     return Context.format(this.json[key]);
