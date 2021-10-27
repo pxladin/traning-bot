@@ -4,6 +4,7 @@ const Context = require('./Traning/Context');
 const Guess = require('./Guessing/Guess');
 const Guesser = require('./Guessing/Guesser');
 const Traning = require('./Traning/Traning');
+const translate = require('./translator/translate');
 
 const collection = new Collection('data/traninge.json');
 collection.load();
@@ -11,9 +12,13 @@ collection.load();
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
 
-  const command = commands.get(interaction.commandName);
+  const command = commands[interaction.commandName];
 
   if (!command) {
+    interaction.reply(translate('error.command.not_found', {
+      command: interaction.commandName,
+    }));
+
     return;
   }
 

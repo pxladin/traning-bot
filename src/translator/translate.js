@@ -11,7 +11,7 @@ const REPLACER_PREFIX = ':';
  *
  * @returns {string} The translation.
  */
-module.exports = (key, replacer) => {
+module.exports = (key, replacer = {}) => {
   let msg = _.get(translations, key);
 
   if (Array.isArray(msg)) {
