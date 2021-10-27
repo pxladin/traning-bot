@@ -9,4 +9,15 @@ module.exports = {
   formatting: {
     traning: ':author: :content',
   },
+  error: {
+    command: {
+      not_found: 'Der Befehl ":command" existiert nicht.',
+      random: {
+        no_traning: [
+          'Fehler beim asynchronen Laden des Tranings.',
+          'Wir leben in einer Welt mit asynchronen Traning-Fetch-Methoden und wir finden keinen Traning.',
+        ],
+      },
+    },
+  },
 };
