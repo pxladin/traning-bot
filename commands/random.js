@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const translate = require('../src/translator/translate');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -9,6 +10,8 @@ module.exports = {
 
     if (randomTraning) {
       interaction.reply({ content: randomTraning, ephemeral: true });
+    } else {
+      interaction.reply({ content: translate('error.command.random.no_traning'), ephemeral: true });
     }
   },
 };
