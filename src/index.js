@@ -11,7 +11,7 @@ collection.load();
 client.on('interactionCreate', async (interaction) => {
   if (!interaction.isCommand()) return;
 
-  const command = commands.get(interaction.commandName);
+  const command = commands[interaction.commandName];
 
   if (!command) {
     return;

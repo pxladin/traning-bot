@@ -1,15 +1,11 @@
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const fs = require('fs');
 const { token, clientId, guildId } = require('../config.json');
 
 const commands = [];
-const commandFiles = fs.readdirSync('./commands');
+const commandFiles = require('../commands');
 
-commandFiles.forEach((file) => {
-  // eslint-disable-next-line global-require
-  const command = require(`../commands/${file}`);
-
+Object.values(commandFiles).forEach((command) => {
   commands.push(command.data.toJSON());
 });
 
