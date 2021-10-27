@@ -85,7 +85,7 @@ class Collection {
   }
 
   random() {
-    if (!_.size(this.traninge)) {
+    if (!_.size(this.json)) {
       return null;
     }
 
