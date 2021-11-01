@@ -62,10 +62,10 @@ class Guesser {
     this.guesses.push(guess.author);
 
     if (traningLine.author === guess.author) {
-      traning.lines.forEach((t) => {
-        if (t.author === guess.author) {
+      traning.lines.forEach((line) => {
+        if (line.author === guess.author) {
           // eslint-disable-next-line no-param-reassign
-          t.solver = this;
+          line.solver = this;
         }
       });
 
