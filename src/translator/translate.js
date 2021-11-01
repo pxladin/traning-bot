@@ -7,22 +7,22 @@ const REPLACER_PREFIX = ':';
  * Translates a key into a string.
  *
  * @param {string} key The translation key.
- * @param {Object<string, any>} replacer An object of strings to replace with given values.
+ * @param {Object<string, any> | null} replacer An object of strings to replace with given values.
  *
  * @returns {string} The translation.
  */
-module.exports = (key, replacer = {}) => {
-  let msg = _.get(translations, key);
+module.exports = (key, replacer = null) => {
+  let translation = _.get(translations, key);
 
-  if (Array.isArray(msg)) {
-    msg = _.sample(msg);
+  if (Array.isArray(translation)) {
+    translation = _.sample(translation);
   }
 
   if (replacer) {
     Object.keys(replacer).forEach((k) => {
-      msg = msg.replace(REPLACER_PREFIX + k, replacer[k]);
+      translation = translation.replace(REPLACER_PREFIX + k, replacer[k]);
     });
   }
 
-  return msg;
+  return translation;
 };

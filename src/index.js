@@ -1,23 +1,27 @@
 const { client, commands } = require('./client');
-const Collection = require('./Traning/Collection');
-const Context = require('./Traning/Context');
-const Guess = require('./Guessing/Guess');
-const Guesser = require('./Guessing/Guesser');
-const Traning = require('./Traning/Traning');
+const Collection = require('./classes/Collection');
+const Traning = require('./classes/Traning');
+const Guess = require('./classes/Guess');
+const Guesser = require('./classes/Guesser');
+const TraningLine = require('./classes/TraningLine');
 const translate = require('./translator/translate');
 
 const collection = new Collection('data/traninge.json');
 collection.load();
 
 client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isCommand()) return;
+  if (!interaction.isCommand()) {
+    return;
+  }
 
   const command = commands[interaction.commandName];
 
   if (!command) {
-    interaction.reply(translate('error.command.not_found', {
-      command: interaction.commandName,
-    }));
+    interaction.reply(
+      translate('error.command.not_found', {
+        command: interaction.commandName,
+      }),
+    );
 
     return;
   }
@@ -30,36 +34,45 @@ client.on('messageCreate', async (msg) => {
     return;
   }
 
-  const { content, channelId } = msg;
+  const { content, channelId, channel } = msg;
 
-  if (Guess.isGuess(content) || Traning.isTraning(content)) {
-    if (collection.has(channelId)) {
-      if (!collection.guessers.has(msg.author.id)) {
-        collection.guessers.set(msg.author.id, new Guesser(msg.author));
-      }
+  if (
+    Guess.isGuess(content) &&
+    channel.isThread() &&
+    collection.has(channelId)
+  ) {
+    // @ts-ignore
+    const guesser = new Guesser(msg.author);
+    const traning = collection.get(channelId);
+    const isSolved = guesser.guess(msg, traning);
 
-      const guesser = collection.guessers.get(msg.author.id);
-      const context = collection.get(channelId);
-      const isSolved = guesser.guess(msg, context);
+    if (isSolved) {
+      collection.set(channelId, traning);
 
-      if (isSolved) {
-        collection.set(channelId, context);
-        context.sync();
+      const starterMessage = await channel.fetchStarterMessage();
+
+      if (starterMessage.editable) {
+        starterMessage.edit(Traning.format(traning));
       }
     }
-
-    if (Traning.isTraning(content)) {
-      if (msg.deletable) {
-        msg.delete();
-      }
-
-      const context = new Context(msg);
-
-      context.parse();
-      await context.startGuessThread();
-      collection.set(context.thread.id, context);
+  } else if (TraningLine.isTraningLine(content)) {
+    if (msg.deletable) {
+      msg.delete();
     }
 
-    collection.sync();
+    const traning = new Traning(content, msg.author);
+
+    traning.parse();
+
+    const starterMessage = await channel.send(Traning.format(traning));
+
+    const thread = await starterMessage.startThread({
+      name: translate('guessing.thread_title'),
+      autoArchiveDuration: 'MAX',
+    });
+
+    collection.set(thread.id, traning);
   }
+
+  collection.sync();
 });
