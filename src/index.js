@@ -16,13 +16,11 @@ client.on('messageCreate', (message) => {
   if (content.startsWith(prefix)) {
     const [command, ...args] = content.slice(prefix.length).split(/ +/g);
 
-    commands[command]?.call(null, client, message, ...args);
+    commands[command]?.call(null, client, message, args);
   } else if (scopes[message.guildId] === message.channelId) {
-    const ctx = new Context(content.trim().replace(/ +/g, ' '));
+    const ctx = new Context(content).parse();
 
-    if (ctx.contents.length) {
-      storage.add(channel.id, ctx);
-
+    if (ctx.contents.length > 0) {
       channel.send(ctx.toString());
     }
   }

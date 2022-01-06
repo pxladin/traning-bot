@@ -1,3 +1,3 @@
-module.exports = (traning) => {
-  traning.author.decrypt();
+module.exports = (quote, author) => {
+  author.decrypt();
 };

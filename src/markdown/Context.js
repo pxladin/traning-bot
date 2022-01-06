@@ -2,7 +2,6 @@ const ContentTypes = require('./content');
 
 /* eslint-disable */
 const BaseContent = require('./content/BaseContent');
-const Author = require('./content/traning/Author');
 /* eslint-enable */
 
 class Context {
@@ -12,15 +11,11 @@ class Context {
   constructor(string) {
     this.raw = string;
     /**
-     * @type {Array<Author>}
-     */
-    this.authors = [];
-    /**
      * @type {Array<BaseContent>}
      */
     this.contents = [];
+    this.messageQueue = [];
     this.storage = {};
-    this.solved = false;
     this.cachedString = '';
   }
 
@@ -32,14 +27,18 @@ class Context {
 
       Object.values(ContentTypes).forEach((ContentType) => {
         if (ContentType.is(line)) {
-          const content = new ContentType(this, line).parse();
+          const content = new ContentType(this).parse(line);
 
           this.contents.push(content);
         }
       });
     });
-console.log(this.contents);
+
     return this;
+  }
+
+  toString() {
+    return this.contents.map((content) => content.toString()).join('\n');
   }
 
   toJSON() {

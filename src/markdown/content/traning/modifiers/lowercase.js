@@ -1,3 +1,3 @@
-module.exports = (traning) => {
-  traning.quote.value = traning.quote.value.toLowerCase();
+module.exports = (quote) => {
+  quote.content = quote.content.toLowerCase();
 };
