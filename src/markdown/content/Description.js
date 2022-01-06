@@ -13,7 +13,7 @@ class Description extends BaseContent {
   }
 
   toString() {
-    return this.content;
+    return `Kontext: ${this.content}`;
   }
 }
 

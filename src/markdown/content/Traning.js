@@ -15,13 +15,20 @@ class Traning extends BaseContent {
       storage.authors = [];
     }
 
-    const { authors } = storage;
+    /**
+     * @type {Array<Author>}
+     */
+    // eslint-disable-next-line prefer-destructuring
+    const authors = storage.authors;
 
     const {
       author: authorName,
       modifiers,
       quote,
     } = this.extractGroups(raw, 'traning');
+
+    this.quote = new Quote(quote);
+    this.modifiers = [];
 
     let author;
     let authorIndex = authors.findIndex(
@@ -36,9 +43,7 @@ class Traning extends BaseContent {
     }
 
     this.authorId = authorIndex;
-    this.quote = new Quote(quote);
 
-    this.modifiers = [];
     const invalidModifiers = [];
 
     if (modifiers) {
@@ -64,29 +69,10 @@ class Traning extends BaseContent {
   }
 
   toString() {
-    const { authors } = this.ctx.storage;
-    const author = authors[this.authorId];
-    let quote = this.quote.toString();
+    const author = this.ctx.storage.authors[this.authorId];
+    const authorName = author.decrypted ? author.name : this.authorId + 1;
 
-    authors.forEach(({ name: authorName, decrypted }, index) => {
-      const nameRegex = new RegExp(`<${authorName}>`, 'gi');
-
-      if (nameRegex.test(quote)) {
-        let replacer;
-
-        if (decrypted) {
-          replacer = authorName;
-        } else {
-          replacer = `<${index + 1}>`;
-        }
-
-        quote = quote.replace(nameRegex, replacer);
-      }
-    });
-
-    return [author.decrypted ? author.name : this.authorId + 1, quote].join(
-      ': ',
-    );
+    return `${authorName}: ${this.quote.toString()}`;
   }
 }
 

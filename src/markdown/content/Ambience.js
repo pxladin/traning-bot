@@ -10,7 +10,7 @@ class Ambience extends BaseContent {
   }
 
   toString() {
-    return this.content;
+    return `*${this.content}*`;
   }
 }
 

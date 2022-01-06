@@ -21,6 +21,8 @@ client.on('messageCreate', (message) => {
     const ctx = new Context(content).parse();
 
     if (ctx.contents.length > 0) {
+      ctx.messageQueue.forEach((msg) => void channel.send(msg));
+
       channel.send(ctx.toString());
     }
   }

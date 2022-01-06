@@ -38,7 +38,29 @@ class Context {
   }
 
   toString() {
-    return this.contents.map((content) => content.toString()).join('\n');
+    let contextString = this.contents
+      .map((content) => content.toString())
+      .join('\n');
+
+    if (this.storage.authors) {
+      this.storage.authors.forEach(({ name: authorName, decrypted }, index) => {
+        const nameRegex = new RegExp(`<${authorName}>`, 'gi');
+
+        if (nameRegex.test(contextString)) {
+          let replacer;
+
+          if (decrypted) {
+            replacer = authorName;
+          } else {
+            replacer = `<${index + 1}>`;
+          }
+
+          contextString = contextString.replace(nameRegex, replacer);
+        }
+      });
+    }
+
+    return contextString;
   }
 
   toJSON() {
