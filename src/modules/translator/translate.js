@@ -1,4 +1,4 @@
-const translations = require('../../resources/translations');
+const translations = require('../../translations');
 
 const REPLACER_PREFIX = ':';
 

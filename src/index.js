@@ -1,8 +1,8 @@
 const { client, commands } = require('./client');
 const { prefix } = require('../config.json');
+const Context = require('./markdown/Context');
 const scopes = require('../data/scopes.json');
 const Storage = require('./Storage');
-const Context = require('./markdown/Context');
 
 const storage = new Storage();
 

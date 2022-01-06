@@ -1,6 +1,6 @@
 module.exports = {
-  BaseContent: require('./BaseContent'),
   Ambience: require('./Ambience'),
+  BaseContent: require('./BaseContent'),
   Description: require('./Description'),
   Traning: require('./Traning'),
 };
