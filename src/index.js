@@ -1,78 +1,29 @@
 const { client, commands } = require('./client');
-const Collection = require('./classes/Collection');
-const Traning = require('./classes/Traning');
-const Guess = require('./classes/Guess');
-const Guesser = require('./classes/Guesser');
-const TraningLine = require('./classes/TraningLine');
-const translate = require('./translator/translate');
+const { prefix } = require('../config.json');
+const scopes = require('../data/scopes.json');
+const Storage = require('./Storage');
+const Context = require('./markdown/Context');
 
-const collection = new Collection('data/traninge.json');
-collection.load();
+const storage = new Storage();
 
-client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isCommand()) {
+client.on('messageCreate', (message) => {
+  if (message.author.id === client.user.id) {
     return;
   }
 
-  const command = commands[interaction.commandName];
+  const { content, channel } = message;
 
-  if (!command) {
-    interaction.reply(
-      translate('error.command.not_found', {
-        command: interaction.commandName,
-      }),
-    );
+  if (content.startsWith(prefix)) {
+    const [command, ...args] = content.slice(prefix.length).split(/ +/g);
 
-    return;
-  }
+    commands[command]?.call(null, client, message, ...args);
+  } else if (scopes[message.guildId] === message.channelId) {
+    const ctx = new Context(content.trim().replace(/ +/g, ' '));
 
-  command.execute(interaction, collection);
-});
+    if (ctx.contents.length) {
+      storage.add(channel.id, ctx);
 
-client.on('messageCreate', async (msg) => {
-  if (msg.author.id === client.user.id) {
-    return;
-  }
-
-  const { content, channelId, channel } = msg;
-
-  if (
-    Guess.isGuess(content) &&
-    channel.isThread() &&
-    collection.has(channelId)
-  ) {
-    // @ts-ignore
-    const guesser = new Guesser(msg.author);
-    const traning = collection.get(channelId);
-    const isSolved = guesser.guess(msg, traning);
-
-    if (isSolved) {
-      collection.set(channelId, traning);
-
-      const starterMessage = await channel.fetchStarterMessage();
-
-      if (starterMessage.editable) {
-        starterMessage.edit(Traning.format(traning));
-      }
+      channel.send(ctx.toString());
     }
-  } else if (TraningLine.isTraningLine(content)) {
-    if (msg.deletable) {
-      msg.delete();
-    }
-
-    const traning = new Traning(content, msg.author);
-
-    traning.parse();
-
-    const starterMessage = await channel.send(Traning.format(traning));
-
-    const thread = await starterMessage.startThread({
-      name: translate('guessing.thread_title'),
-      autoArchiveDuration: 'MAX',
-    });
-
-    collection.set(thread.id, traning);
   }
-
-  collection.sync();
 });
