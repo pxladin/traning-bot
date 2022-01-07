@@ -24,6 +24,7 @@ client.on('messageCreate', (message) => {
       ctx.metaData = {
         id: message.id,
         channelId: channel.id,
+        timestamp: Date.now(),
         submitter: {
           id: author.id,
           name: author.tag,

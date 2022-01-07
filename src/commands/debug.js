@@ -8,6 +8,7 @@ module.exports = (client, { channel, id: messageId, author }, args) => {
   ctx.metaData = {
     id: messageId,
     channelId: channel.id,
+    timestamp: Date.now(),
     submitter: {
       id: author.id,
       name: author.tag,
