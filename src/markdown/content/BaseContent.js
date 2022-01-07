@@ -1,6 +1,9 @@
 const regex = require('../regex');
 
 class BaseContent {
+  HIDE = false;
+  IS_SOLVABLE = false;
+
   constructor(context) {
     if (this.constructor.name === 'BaseContent') {
       throw new Error('BaseContent cannot be instantiated');
@@ -11,10 +14,6 @@ class BaseContent {
 
   static get PATTERN() {
     return /\0/;
-  }
-
-  static get IS_SOLVABLE() {
-    return false;
   }
 
   /**

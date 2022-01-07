@@ -11,7 +11,7 @@ client.on('messageCreate', (message) => {
     return;
   }
 
-  const { content, channel } = message;
+  const { content, channel, author } = message;
 
   if (content.startsWith(prefix)) {
     const [command, ...args] = content.slice(prefix.length).split(/ +/g);
@@ -21,6 +21,15 @@ client.on('messageCreate', (message) => {
     const ctx = new Context(content).parse();
 
     if (ctx.contents.length > 0) {
+      ctx.metaData = {
+        id: message.id,
+        channelId: channel.id,
+        submitter: {
+          id: author.id,
+          name: author.tag,
+        },
+      };
+
       ctx.messageQueue.forEach((msg) => void channel.send(msg));
 
       channel.send(ctx.toString());

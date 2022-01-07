@@ -16,7 +16,7 @@ class Context {
     this.contents = [];
     this.messageQueue = [];
     this.storage = {};
-    this.cachedString = '';
+    this.metaData = {};
   }
 
   parse() {
@@ -38,9 +38,15 @@ class Context {
   }
 
   toString() {
-    let contextString = this.contents
-      .map((content) => content.toString())
-      .join('\n');
+    const filteredContents = [];
+
+    this.contents.forEach((content) => {
+      if (!content.HIDE) {
+        filteredContents.push(content);
+      }
+    });
+
+    let contextString = filteredContents.join('\n');
 
     if (this.storage.authors) {
       this.storage.authors.forEach(({ name: authorName, decrypted }, index) => {

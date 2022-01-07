@@ -4,9 +4,7 @@ const modifierHandlers = require('./traning/modifiers');
 const Quote = require('./traning/Quote');
 
 class Traning extends BaseContent {
-  static get IS_SOLVABLE() {
-    return true;
-  }
+  IS_SOLVABLE = true;
 
   parse(raw) {
     const { storage } = this.ctx;
@@ -28,7 +26,6 @@ class Traning extends BaseContent {
     } = this.extractGroups(raw, 'traning');
 
     this.quote = new Quote(quote);
-    this.modifiers = [];
 
     let author;
     let authorIndex = authors.findIndex(
@@ -42,11 +39,12 @@ class Traning extends BaseContent {
       author = authors[authorIndex];
     }
 
-    this.authorId = authorIndex;
-
-    const invalidModifiers = [];
+    this.authorId = authorIndex + 1;
 
     if (modifiers) {
+      this.modifiers = [];
+      const invalidModifiers = [];
+
       Array.from(modifiers).forEach((modifier) => {
         const handle = modifierHandlers[modifier];
 
@@ -69,8 +67,8 @@ class Traning extends BaseContent {
   }
 
   toString() {
-    const author = this.ctx.storage.authors[this.authorId];
-    const authorName = author.decrypted ? author.name : this.authorId + 1;
+    const author = this.ctx.storage.authors[this.authorId - 1];
+    const authorName = author.decrypted ? author.name : this.authorId;
 
     return `${authorName}: ${this.quote.toString()}`;
   }
