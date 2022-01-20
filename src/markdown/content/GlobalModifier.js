@@ -2,8 +2,6 @@ const BaseContent = require('./BaseContent');
 const globalModifierHandlers = require('./global-modifer/index');
 
 class GlobalModifier extends BaseContent {
-  HIDE = true;
-
   parse(raw) {
     const { content } = this.extractGroups(
       raw.replace(/ +/g, ' '),

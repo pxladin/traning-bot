@@ -3,7 +3,7 @@ class Quote {
    * @param {string} string - The raw string.
    */
   constructor(string) {
-    this.content = string.replace(/["']/g, '').replace(/ +/g, ' ');
+    this.content = string.replace(/["']/g, '').trim().replace(/ +/g, ' ');
   }
 
   toString() {

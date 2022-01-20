@@ -4,11 +4,11 @@ const storage = require('../data/storage.json');
 
 class Storage {
   constructor() {
-    this.loadedStorage = {};
+    this.values = {};
     this.json = storage;
 
     Object.keys(storage).forEach((key) => {
-      this.loadedStorage[key] = new Context(storage[key].raw);
+      this.values[key] = Context.fromJSON(storage[key]);
     });
   }
 
@@ -16,13 +16,20 @@ class Storage {
     fs.writeFileSync('data/storage.json', JSON.stringify(this.json, null, 2));
   }
 
-  add(id, ctx) {
-    this.loadedStorage[id] = ctx;
+  set(id, ctx) {
+    this.values[id] = ctx;
     this.json[id] = ctx.toJSON();
+
+    this.save();
+
+    return this;
   }
 
+  /**
+   * @returns {Context}
+   */
   get(id) {
-    return this.loadedStorage[id];
+    return this.values[id];
   }
 }
 

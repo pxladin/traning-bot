@@ -41,8 +41,10 @@ class Context {
     const filteredContents = [];
 
     this.contents.forEach((content) => {
-      if (!content.HIDE) {
-        filteredContents.push(content);
+      const string = content.toString();
+
+      if (string) {
+        filteredContents.push(string);
       }
     });
 
@@ -70,7 +72,23 @@ class Context {
   }
 
   toJSON() {
-    return { ...this };
+    const copy = { ...this };
+
+    // @ts-ignore
+    copy.contents = copy.contents.map((content) => content.toString());
+
+    delete copy.messageQueue;
+
+    return copy;
+  }
+
+  static fromJSON(data) {
+    const ctx = new Context(data.raw).parse();
+
+    ctx.metaData = data.metaData;
+    ctx.storage = data.storage;
+
+    return ctx;
   }
 }
 

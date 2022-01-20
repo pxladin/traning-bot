@@ -29,7 +29,7 @@ class Traning extends BaseContent {
 
     let author;
     let authorIndex = authors.findIndex(
-      (a) => a.name === authorName.toUpperCase(),
+      (a) => a.name === authorName.trim().toUpperCase(),
     );
 
     if (authorIndex === -1) {

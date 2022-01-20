@@ -1,8 +1,7 @@
 const regex = require('../regex');
 
 class BaseContent {
-  HIDE = false;
-  IS_SOLVABLE = false;
+  IS_SOLVABLE = true;
 
   constructor(context) {
     if (this.constructor.name === 'BaseContent') {
