@@ -3,16 +3,16 @@ module.exports = {
     node: true,
     es2021: true,
   },
-  extends: 'airbnb-base',
+  parserOptions: {
+    ecmaVersion: 'latest',
+  },
+  plugins: ['regexp'],
+  extends: ['prettier', 'problems'],
   rules: {
     'linebreak-style': ['error', 'unix'],
+    'no-console': 'warn',
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
-    'operator-linebreak': 'off',
-    'implicit-arrow-linebreak': 'off',
-    'function-paren-newline': 'off',
-    'no-underscore-dangle': 'off',
-    'generator-star-spacing': 'off',
-    'import/no-dynamic-require': 'off',
+    strict: 'off',
   },
 };

@@ -1,65 +1,96 @@
 const { client, commands } = require('./client');
-const Collection = require('./Traning/Collection');
-const Context = require('./Traning/Context');
-const Guess = require('./Guessing/Guess');
-const Guesser = require('./Guessing/Guesser');
-const Traning = require('./Traning/Traning');
-const translate = require('./translator/translate');
+const { prefix } = require('../config.json');
+const Context = require('./markdown/Context');
+const Traning = require('./markdown/content/Traning');
+const scopes = require('../data/scopes.json');
+const storage = require('./global/storage');
 
-const collection = new Collection('data/traninge.json');
-collection.load();
-
-client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isCommand()) return;
-
-  const command = commands[interaction.commandName];
-
-  if (!command) {
-    interaction.reply(translate('error.command.not_found', {
-      command: interaction.commandName,
-    }));
-
+client.on('messageCreate', (message) => {
+  if (message.author.id === client.user.id) {
     return;
   }
 
-  command.execute(interaction, collection);
-});
+  const { content, channel, author } = message;
 
-client.on('messageCreate', async (msg) => {
-  if (msg.author.id === client.user.id) {
-    return;
-  }
+  if (content.startsWith(prefix)) {
+    const [command, ...args] = content.slice(prefix.length).split(/ +/g);
 
-  const { content, channelId } = msg;
+    commands[command]?.call(null, client, message, args);
+  } else if (scopes[message.guildId] === message.channelId) {
+    const ctx = new Context(content).parse();
 
-  if (Guess.isGuess(content) || Traning.isTraning(content)) {
-    if (collection.has(channelId)) {
-      if (!collection.guessers.has(msg.author.id)) {
-        collection.guessers.set(msg.author.id, new Guesser(msg.author));
-      }
+    if (ctx.contents.length > 0) {
+      message.delete();
 
-      const guesser = collection.guessers.get(msg.author.id);
-      const context = collection.get(channelId);
-      const isSolved = guesser.guess(msg, context);
+      ctx.metaData = {
+        id: message.id,
+        channelId: channel.id,
+        timestamp: Date.now(),
+        submitter: {
+          id: author.id,
+          name: author.tag,
+        },
+      };
 
-      if (isSolved) {
-        collection.set(channelId, context);
-        context.sync();
-      }
+      ctx.messageQueue.forEach((msg) => void channel.send(msg));
+
+      channel.send(ctx.toString()).then((message) => {
+        message
+          .startThread({
+            name: 'Guess the dropper(s) of the traning.',
+            autoArchiveDuration: 'MAX',
+          })
+          .then((channel) => {
+            storage.set(channel.id, ctx);
+          });
+      });
     }
+  } else if (channel.isThread() && storage.get(channel.id)) {
+    const ctx = storage.get(channel.id);
 
-    if (Traning.isTraning(content)) {
-      if (msg.deletable) {
-        msg.delete();
+    if (ctx.storage.authors.length > 0) {
+      const guess = content.trim();
+      const author = ctx.storage.authors.find(
+        (author) => author.name.toLowerCase() === guess,
+      );
+
+      if (author) {
+        author.decrypt();
+        author.metaData = {
+          solvedAt: Date.now(),
+          solver: {
+            author: message.author.tag,
+            id: message.author.id,
+          },
+        };
+      } else if (/\d+ *: *\w+/.test(guess)) {
+        const [id, name] = guess.split(/ *: */g);
+
+        ctx.contents.forEach((content) => {
+          if (
+            content instanceof Traning &&
+            content.authorId === parseInt(id, 10)
+          ) {
+            const author = ctx.storage.authors[content.authorId - 1];
+
+            if (author.name === name) {
+              author.decrypt();
+              author.metaData = {
+                solvedAt: Date.now(),
+                solver: {
+                  author: message.author.tag,
+                  id: message.author.id,
+                },
+              };
+            }
+          }
+        });
       }
 
-      const context = new Context(msg);
-
-      context.parse();
-      await context.startGuessThread();
-      collection.set(context.thread.id, context);
+      channel.fetchStarterMessage({ force: true }).then((message) => {
+        message.edit(ctx.toString());
+        storage.set(channel.id, ctx);
+      });
     }
-
-    collection.sync();
   }
 });

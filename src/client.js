@@ -1,9 +1,13 @@
-const { Client } = require('discord.js');
+const { Client, Intents } = require('discord.js');
+const commands = require('./commands');
 const { token } = require('../config.json');
-const commands = require('../commands');
 
 const client = new Client({
-  intents: ['GUILDS', 'GUILD_MESSAGES', 'DIRECT_MESSAGES'],
+  intents: [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.DIRECT_MESSAGES,
+  ],
   partials: ['CHANNEL'],
 });
 
